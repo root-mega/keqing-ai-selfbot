@@ -8,16 +8,18 @@ const client = new Client({
 
 // Use c.ai plus
 characterAI.requester.usePlus = false;
+// Keyword
+const keyword = "ganyu"; // Ganyu
 // Set the character id
-const charId = "yMYt_d44Jp5xrSRnYaaBa0RvLIo2ImlhrD2KZ4g4krg"; // Keqing
+const charId = "I3OCwWQKKEj12lt3mpLvHRyrBdXgotqVUHg0MzAGmSk"; // Ganyu
 
 client.on("messageCreate", async (message) => {
     // Pass the message from message.content to the c.ai API
     const messageContent = message.content;
 
     // Listen for message that contains the magic word "keqing"
-    if (message.content.toLowerCase().includes("keqing")) {
-        console.log(messageContent);
+    if (message.content.toLowerCase().includes(keyword)) {
+        // console.log(messageContent);
 
         (async () => {
             // c.ai part
