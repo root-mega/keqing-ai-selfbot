@@ -22,13 +22,14 @@ client.on("messageCreate", async (message) => {
         // console.log(messageContent);
 
         (async () => {
+            // TODO: Add if user reply to message.reply, continue the conversation
+
             // c.ai part
             const chat = await characterAI.createOrContinueChat(charId);
             const response = await chat.sendAndAwaitResponse(
                 messageContent,
                 true
             );
-            console.log(response.text);
             message.reply(response.text);
         })();
     }
@@ -43,13 +44,14 @@ authenticate()
     .then(() => {
         // Authentication completed
         console.log("c.ai authentication completed");
+
+        // Authenticate with Discord
+        client.login(process.env.Token);
     })
     .catch((error) => {
-        console.error("c.ai authentication failed:", error);
+        console.error("c.ai authentication failed:\n", error);
     });
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}`);
 });
-
-client.login(process.env.Token);
