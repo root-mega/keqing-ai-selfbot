@@ -1,46 +1,35 @@
-// ECHO est� activado.
-// by git (root-mega) for honey :3
-
-const { Client } = require('discord.js-selfbot-v13');
-const client = new Client({
-	// See other options here
-	// https://discordjs-self-v13.netlify.app/#/docs/docs/main/typedef/ClientOptions
-	// All partials are loaded automatically
-});
-const { token, caiToken } = require('./config.json')
+const dotenv = require("dotenv").config();
+const { Client } = require("discord.js-selfbot-v13");
 const CharacterAI = require("node_characterai");
-const cai = new CharacterAI();
+const characterAI = new CharacterAI();
+const client = new Client({
+    checkUpdate: false,
+});
 
-// i set previously a token of an account for you :3
+const charId = "yMYt_d44Jp5xrSRnYaaBa0RvLIo2ImlhrD2KZ4g4krg"; // Keqing
 
-client.on('ready', async () => {
-  console.log(`${client.user.username} is ready!`);
-})
+client.on("ready", () => {
+    console.log(`Logged in as ${client.user.tag}`);
+});
 
-client.on("messageCreate", message => {
+client.on("messageCreate", async (message) => {
+    // Pass the message from message.content to the c.ai API
     const args = message.content;
-    const command = args
+    const command = args;
 
-    if (command.includes("keqing")) {
-        console.log('Keqing word message detected! Running AI...');
+    // Listen for message that contains the magic word "keqing"
+    if (message.content.toLowerCase().includes("keqing")) {
+        console.log(command);
+
         (async () => {
-            // Authenticating as a guest (use `.authenticateWithToken()` to use an account)
-            await cai.authenticateWithToken(caiToken)
-          
-            // Place your character's id here
-            const characterId = "yMYt_d44Jp5xrSRnYaaBa0RvLIo2ImlhrD2KZ4g4krg";
-          
-            const chat = await cai.createOrContinueChat(characterId);
-            
-            // Send a message
+            // c.ai part
+            await characterAI.authenticateWithToken(process.env.caiToken);
+            const chat = await characterAI.createOrContinueChat(charId);
             const response = await chat.sendAndAwaitResponse(command, true);
-          
             console.log(response.text);
-
-            message.reply(response.text)
-            // Use `response.text` to use it as a string
-          })();
+            message.reply(response.text);
+        })();
     }
 });
 
-client.login(token);
+client.login(process.env.Token);
