@@ -17,7 +17,7 @@ client.on("messageCreate", async (message) => {
     // Pass the message from message.content to the c.ai API
     const messageContent = message.content;
 
-    // Listen for message that contains the magic word "keqing"
+    // Listen for message that contains the magic word "ganyu"
     if (message.content.toLowerCase().includes(keyword)) {
         // console.log(messageContent);
 
