@@ -1,46 +1,57 @@
-// ECHO est� activado.
-// by git (root-mega) for honey :3
-
-const { Client } = require('discord.js-selfbot-v13');
-const client = new Client({
-	// See other options here
-	// https://discordjs-self-v13.netlify.app/#/docs/docs/main/typedef/ClientOptions
-	// All partials are loaded automatically
-});
-const { token, caiToken } = require('./config.json')
+const dotenv = require("dotenv").config();
+const { Client } = require("discord.js-selfbot-v13");
 const CharacterAI = require("node_characterai");
-const cai = new CharacterAI();
+const characterAI = new CharacterAI();
+const client = new Client({
+    checkUpdate: false,
+});
 
-// i set previously a token of an account for you :3
+// Use c.ai plus
+characterAI.requester.usePlus = false;
+// Keyword
+const keyword = "ganyu"; // Ganyu
+// Set the character id
+const charId = "I3OCwWQKKEj12lt3mpLvHRyrBdXgotqVUHg0MzAGmSk"; // Ganyu
 
-client.on('ready', async () => {
-  console.log(`${client.user.username} is ready!`);
-})
+client.on("messageCreate", async (message) => {
+    // Pass the message from message.content to the c.ai API
+    const messageContent = message.content;
 
-client.on("messageCreate", message => {
-    const args = message.content;
-    const command = args
+    // Listen for message that contains the magic word "ganyu"
+    if (message.content.toLowerCase().includes(keyword)) {
+        // console.log(messageContent);
 
-    if (command.includes("keqing")) {
-        console.log('Keqing word message detected! Running AI...');
         (async () => {
-            // Authenticating as a guest (use `.authenticateWithToken()` to use an account)
-            await cai.authenticateWithToken(caiToken)
-          
-            // Place your character's id here
-            const characterId = "yMYt_d44Jp5xrSRnYaaBa0RvLIo2ImlhrD2KZ4g4krg";
-          
-            const chat = await cai.createOrContinueChat(characterId);
-            
-            // Send a message
-            const response = await chat.sendAndAwaitResponse(command, true);
-          
-            console.log(response.text);
+            // TODO: Add if user reply to message.reply, continue the conversation
 
-            message.reply(response.text)
-            // Use `response.text` to use it as a string
-          })();
+            // c.ai part
+            const chat = await characterAI.createOrContinueChat(charId);
+            const response = await chat.sendAndAwaitResponse(
+                messageContent,
+                true
+            );
+            message.reply(response.text);
+        })();
     }
 });
 
-client.login(token);
+// Authenticate with the c.ai API
+async function authenticate() {
+    await characterAI.authenticateWithToken(process.env.caiToken);
+}
+
+authenticate()
+    .then(() => {
+        // Authentication completed
+        console.log("c.ai authentication completed");
+
+        // Authenticate with Discord
+        client.login(process.env.Token);
+    })
+    .catch((error) => {
+        console.error("c.ai authentication failed:\n", error);
+    });
+
+client.on("ready", () => {
+    console.log(`Logged in as ${client.user.tag}`);
+});
