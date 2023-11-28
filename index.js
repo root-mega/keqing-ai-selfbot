@@ -6,30 +6,48 @@ const client = new Client({
     checkUpdate: false,
 });
 
+// Use c.ai plus
+characterAI.requester.usePlus = false;
+// Set the character id
 const charId = "yMYt_d44Jp5xrSRnYaaBa0RvLIo2ImlhrD2KZ4g4krg"; // Keqing
-
-client.on("ready", () => {
-    console.log(`Logged in as ${client.user.tag}`);
-});
 
 client.on("messageCreate", async (message) => {
     // Pass the message from message.content to the c.ai API
-    const args = message.content;
-    const command = args;
+    const messageContent = message.content;
 
     // Listen for message that contains the magic word "keqing"
     if (message.content.toLowerCase().includes("keqing")) {
-        console.log(command);
+        console.log(messageContent);
 
         (async () => {
             // c.ai part
-            await characterAI.authenticateWithToken(process.env.caiToken);
             const chat = await characterAI.createOrContinueChat(charId);
-            const response = await chat.sendAndAwaitResponse(command, true);
+            const response = await chat.sendAndAwaitResponse(
+                messageContent,
+                true
+            );
             console.log(response.text);
             message.reply(response.text);
         })();
     }
+});
+
+// Authenticate with the c.ai API
+async function authenticate() {
+    await characterAI.authenticateWithToken(process.env.caiToken);
+}
+
+authenticate()
+    .then(() => {
+        // Authentication completed
+        console.log("c.ai authentication completed");
+    })
+    .catch((error) => {
+        console.error("c.ai authentication failed:", error);
+    });
+
+client.on("ready", () => {
+    console.log(`Logged in as ${client.user.tag}`);
 });
 
 client.login(process.env.Token);
